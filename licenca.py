@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-from consulta import consulta_cliente
 import mysql.connector
-
 
 con_origem = mysql.connector.connect(
 host='162.241.203.62',
@@ -10,23 +8,16 @@ database='avinfo61_licencas',
 user='avinfo61_servico',
 password='Sclara02'
 )
-
-st.sidebar.image('logonova.bmp', width=150)
-st.sidebar.markdown('''
-    # Licenças Avinfo
+st.image('logonova.bmp', width=100)
+st.title('Licenças') 
+st.consulta_sql = st.text_input('Pesquisar Cliente')
+consulta_sql = "SELECT codigo, cliente, cnpj, dias FROM licencas_clientes WHERE cliente LIKE %s"
+if st.button('Pesquisar'):
+    cursor_consulta = con_origem.cursor()
+    cursor_consulta.execute(consulta_sql, (f'%{st.consulta_sql}%',))
+    cliente_consulta = cursor_consulta.fetchall()
+    tb = pd.DataFrame(cliente_consulta, columns=['Codigo', 'Cliente', 'CNPJ', 'dias'])
+    st.markdown('''
+        ## Consulta Cliente
     ''')
-#Login Sistema
-st.sidebar.markdown('''
-    ## Login    
-    ''')
-usuario = st.sidebar.text_input('Usuário')
-senha = st.sidebar.text_input('Senha', type='password')
-if st.sidebar.button('Entrar'):
-    cursor_login = con_origem.cursor()
-    cursor_login.execute('SELECT * FROM acessos WHERE usuario = %s AND senha = %s', (usuario, senha))
-    login = cursor_login.fetchone()
-    if login:
-        st.sidebar.success('Login efetuado com sucesso!')
-        consulta_cliente() #Funcao de consulta
-    else:
-        st.sidebar.error('Usuário ou senha incorretos!')
+    st.table(tb)
