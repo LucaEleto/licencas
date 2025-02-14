@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from consulta import consulta_cliente
-import conexao
 import mysql.connector
 
 
