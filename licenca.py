@@ -16,7 +16,7 @@ if st.button('Pesquisar'):
     cursor_consulta = con_origem.cursor()
     cursor_consulta.execute(consulta_sql, (f'%{st.consulta_sql}%',))
     cliente_consulta = cursor_consulta.fetchall()
-    tb = pd.DataFrame(cliente_consulta, columns=[ 'Cliente', 'Fantasia', 'dias'])
+    tb = pd.data_editor(cliente_consulta, columns=[ 'Cliente', 'Fantasia', 'dias'])
     st.markdown('''
         ## Consulta Cliente
     ''')
