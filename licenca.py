@@ -8,16 +8,32 @@ database='avinfo61_licencas',
 user='avinfo61_servico',
 password='Sclara02'
 )
+# Interface do Streamlit
 st.image('logonova.bmp', width=100)
 st.title('Licenças') 
-st.consulta_sql = st.text_input('Pesquisar Cliente')
-consulta_sql = "SELECT cliente, fantasia, dias FROM licencas_clientes WHERE cliente LIKE %s OR fantasia LIKE %s"
+
+# Entrada do usuário
+consulta_sql_input = st.text_input('Pesquisar Cliente')
+
+# Consulta SQL
+consulta_sql = """
+SELECT cliente, fantasia, dias 
+FROM licencas_clientes 
+WHERE cliente LIKE %s OR fantasia LIKE %s
+"""
+
+# Ação ao clicar no botão
 if st.button('Pesquisar'):
     cursor_consulta = con_origem.cursor()
-    cursor_consulta.execute(consulta_sql, (f'%{st.consulta_sql}%',))
+    # Passando o mesmo valor duas vezes para os dois campos do LIKE
+    cursor_consulta.execute(consulta_sql, (f'%{consulta_sql_input}%', f'%{consulta_sql_input}%'))
     cliente_consulta = cursor_consulta.fetchall()
-    tb = pd.DataFrame(cliente_consulta, columns=[ 'Cliente', 'Fantasia', 'dias'])
-    st.markdown('''
-        ## Consulta Cliente
-    ''')
-    st.data_editor(tb)
+    cursor_consulta.close()
+
+    # Exibindo os resultados
+    if cliente_consulta:
+        tb = pd.DataFrame(cliente_consulta, columns=['Cliente', 'Fantasia', 'Dias'])
+        st.subheader('Consulta Cliente')
+        st.dataframe(tb)
+    else:
+        st.warning("Nenhum cliente encontrado.")
